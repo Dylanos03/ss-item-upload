@@ -10,6 +10,7 @@ import {
   uploadString,
   getDownloadURL,
 } from "firebase/storage";
+import { useState } from "react";
 
 export type Product = {
   id: string;
@@ -31,8 +32,10 @@ type File = {
 };
 
 export default function Home() {
-  const { register, handleSubmit, control } = useForm<Product>();
+  const [submitting, setSubmitting] = useState(false);
+  const { register, handleSubmit, control, reset } = useForm<Product>();
   const submitHandler = async (data: Product) => {
+    setSubmitting(true);
     try {
       // Get a reference to the storage service
       const storage = getStorage();
@@ -55,12 +58,14 @@ export default function Home() {
           reader.onload = async (e) => {
             if (e.target === null) {
               reject("FileReader error");
+              setSubmitting(false);
               return;
             }
 
             try {
               if (e.target.result === null) {
                 reject("FileReader error");
+                setSubmitting(false);
                 return;
               }
               // Upload the file to the path 'images/{imageName}'
@@ -102,8 +107,11 @@ export default function Home() {
       });
 
       console.log("Document written with ID: ", docRef.id);
+      setSubmitting(false);
+      reset();
     } catch (e) {
       console.error("Error adding document: ", e);
+      setSubmitting(false);
     }
   };
   return (
@@ -115,24 +123,28 @@ export default function Home() {
         <h1 className="text-4xl font-bold mb-8 text-white">Add a product</h1>
         <StoreSelect register={register} />
         <input
+          required
           className=" w-full p-4 border-2 border-gray-300 text-black rounded-lg mb-4"
           type="text"
           placeholder="Product name"
           {...register("name", { required: true })}
         />
         <input
+          required
           className=" w-full p-4 border-2 border-gray-300 text-black rounded-lg mb-4"
           type="number"
           placeholder="Price"
           {...register("price", { required: true })}
         />
         <textarea
+          required
           className=" w-full p-4 border-2 border-gray-300 text-black rounded-lg mb-4"
           placeholder="Description"
           rows={6}
           {...register("desc", { required: true })}
         />
         <textarea
+          required
           className=" w-full p-4 border-2 border-gray-300 text-black rounded-lg mb-4"
           rows={6}
           placeholder="Specs"
@@ -144,6 +156,7 @@ export default function Home() {
           defaultValue={[]}
           render={({ field }) => (
             <input
+              required
               type="file"
               multiple
               className=" w-full p-4 border-2 border-gray-300 rounded-lg mb-4"
@@ -154,6 +167,7 @@ export default function Home() {
         <button
           className=" bg-white w-full p-3 font-bold text-xl"
           type="submit"
+          disabled={submitting}
         >
           submit
         </button>

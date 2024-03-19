@@ -1,9 +1,41 @@
+"use client";
+
 import { deleteDoc, doc } from "firebase/firestore";
 import { db, storage } from "../firebase";
 import { Product } from "../page";
 import { deleteObject, ref } from "@firebase/storage";
+import { useState } from "react";
+
+const DeleteWarning = ({
+  warningHandler,
+}: {
+  warningHandler: (num: number) => void;
+}) => {
+  console.log("DeleteWarning");
+  return (
+    <div className="bg-black bg-opacity-50 flex justify-center items-center h-screen w-screen absolute top-0 left-0">
+      <div className="bg-white p-8 text-black flex flex-col gap-2">
+        <h2 className="text-2xl font-bold">
+          Are you sure you want to delete this?
+        </h2>
+        <div className="flex justify-between">
+          <button className="font-bold p-2" onClick={() => warningHandler(1)}>
+            Cancel
+          </button>
+          <button
+            className="font-bold p-2 bg-red-600 text-white rounded-lg"
+            onClick={() => warningHandler(0)}
+          >
+            Delete
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
 
 function ProductItem({ product, index }: { product: Product; index: number }) {
+  const [showDeleteWarning, setShowDeleteWarning] = useState(false);
   const deleteProduct = async () => {
     try {
       for (const fileUrl of product.files) {
@@ -16,21 +48,36 @@ function ProductItem({ product, index }: { product: Product; index: number }) {
       const docRef = doc(db, "products", product.id); // Get a reference to the document
       await deleteDoc(docRef); // Delete the document
       console.log("Document successfully deleted!");
+      window.location.reload();
     } catch (e) {
       console.error("Error deleting document: ", e);
     }
   };
+
+  const handleWarning = (num: number) => {
+    if (num === 1) {
+      setShowDeleteWarning(false);
+    } else {
+      deleteProduct();
+    }
+  };
   return (
-    <div
+    <tr
       key={product.name + "" + index}
-      className="bg-white text-black p-4 flex flex-col w-full rounded-lg"
+      className="p-2 border text-black bg-white"
     >
-      <h1>Name: {product.name}</h1>
-      <p>Description: {product.desc}</p>
-      <p>Price: {product.price}</p>
-      <p>Specs: {product.specs}</p>
-      <p>Images:</p>
-      <div className="flex gap-2">
+      {showDeleteWarning && (
+        <DeleteWarning warningHandler={(num) => handleWarning(num)} />
+      )}
+      <td>{product.name}</td>
+      <td>{product.desc}</td>
+      <td>{product.price}</td>
+      <td>{product.specs}</td>
+      <td className="underline cursor-pointer">
+        Images: {product.files.length}
+      </td>
+      <td>{product.storeName}</td>
+      {/* <div className="flex gap-2">
         {product.files &&
           product.files.map((file, index) => {
             return (
@@ -42,9 +89,14 @@ function ProductItem({ product, index }: { product: Product; index: number }) {
               />
             );
           })}
-      </div>
-      <button onClick={deleteProduct}>Delete</button>
-    </div>
+      </div> */}
+      {/* <button
+        className="underline text-red-600 flex justify-end"
+        onClick={() => setShowDeleteWarning(true)}
+      >
+        Delete
+      </button> */}
+    </tr>
   );
 }
 
