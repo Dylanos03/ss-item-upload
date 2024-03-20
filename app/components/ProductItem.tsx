@@ -5,6 +5,7 @@ import { db, storage } from "../firebase";
 import { Product } from "../page";
 import { deleteObject, ref } from "@firebase/storage";
 import { useState } from "react";
+import EditMenu from "./editmenu";
 
 const DeleteWarning = ({
   warningHandler,
@@ -36,11 +37,12 @@ const DeleteWarning = ({
 
 function ProductItem({ product, index }: { product: Product; index: number }) {
   const [showDeleteWarning, setShowDeleteWarning] = useState(false);
+  const [showEditMenu, setShowEditMenu] = useState(false);
   const deleteProduct = async () => {
     try {
       for (const fileUrl of product.files) {
         // Create a reference to the file to delete
-        const fileRef = ref(storage, fileUrl);
+        const fileRef = ref(storage, fileUrl.toString()); // Convert fileUrl to a string
 
         // Delete the file
         await deleteObject(fileRef);
@@ -69,33 +71,42 @@ function ProductItem({ product, index }: { product: Product; index: number }) {
       {showDeleteWarning && (
         <DeleteWarning warningHandler={(num) => handleWarning(num)} />
       )}
-      <td>{product.name}</td>
-      <td>{product.desc}</td>
-      <td>{product.price}</td>
-      <td>{product.specs}</td>
+      {showEditMenu && (
+        <EditMenu
+          documentId={product.id}
+          name={product.name}
+          desc={product.desc}
+          spec={product.specs}
+          price={product.price}
+          store={product.storeName}
+          image={product.files}
+          closeMenu={() => setShowEditMenu(false)}
+        />
+      )}
+
+      <td className="border border-gray-300">{product.name}</td>
+      <td className="border border-gray-300">{product.desc}</td>
+      <td className="border border-gray-300">{product.price}</td>
+      <td className="border border-gray-300">{product.specs}</td>
       <td className="underline cursor-pointer">
         Images: {product.files.length}
       </td>
-      <td>{product.storeName}</td>
-      {/* <div className="flex gap-2">
-        {product.files &&
-          product.files.map((file, index) => {
-            return (
-              <img
-                key={file + "" + index}
-                src={file}
-                alt={product.name}
-                className="w-24 h-24"
-              />
-            );
-          })}
-      </div> */}
-      {/* <button
-        className="underline text-red-600 flex justify-end"
-        onClick={() => setShowDeleteWarning(true)}
-      >
-        Delete
-      </button> */}
+      <td className="border border-gray-300">{product.storeName}</td>
+
+      <td>
+        <button
+          className="underline text-blue-600 flex justify-end"
+          onClick={() => setShowEditMenu(true)}
+        >
+          Edit
+        </button>
+        <button
+          className="underline text-red-600 flex justify-end"
+          onClick={() => setShowDeleteWarning(true)}
+        >
+          Delete
+        </button>
+      </td>
     </tr>
   );
 }

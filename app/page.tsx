@@ -11,6 +11,7 @@ import {
   getDownloadURL,
 } from "firebase/storage";
 import { useState } from "react";
+import AddedPopUp from "./components/AddedPopUp";
 
 export type Product = {
   id: string;
@@ -20,7 +21,7 @@ export type Product = {
   specs: string;
   storeId: string;
   storeName: string;
-  files: File[];
+  files: Blob[];
 };
 
 type File = {
@@ -28,11 +29,12 @@ type File = {
   type: string;
   size: number;
   dataUrl: string;
-  Blob: Blob;
+  Blob: Blob[];
 };
 
 export default function Home() {
   const [submitting, setSubmitting] = useState(false);
+  const [popUp, setPopUp] = useState(false);
   const { register, handleSubmit, control, reset } = useForm<Product>();
   const submitHandler = async (data: Product) => {
     setSubmitting(true);
@@ -48,7 +50,7 @@ export default function Home() {
         // Create a storage reference from our storage service
         const storageRef = ref(
           storage,
-          "images/product-images/" + data.files[i].name
+          "images/product-images/" + data.storeName + "/" + data.name + i
         );
 
         // Create a new promise for the upload
@@ -108,7 +110,11 @@ export default function Home() {
 
       console.log("Document written with ID: ", docRef.id);
       setSubmitting(false);
+      setPopUp(true);
       reset();
+      setTimeout(() => {
+        setPopUp(false);
+      }, 5000);
     } catch (e) {
       console.error("Error adding document: ", e);
       setSubmitting(false);
@@ -116,12 +122,13 @@ export default function Home() {
   };
   return (
     <main className="flex min-h-screen flex-col items-center text-black justify-between p-24">
+      {popUp && <AddedPopUp />}
       <form
         onSubmit={handleSubmit(submitHandler)}
         className="flex flex-col items-center justify-center w-full"
       >
         <h1 className="text-4xl font-bold mb-8 text-white">Add a product</h1>
-        <StoreSelect register={register} />
+        <StoreSelect register={register} defaultStore="" />
         <input
           required
           className=" w-full p-4 border-2 border-gray-300 text-black rounded-lg mb-4"

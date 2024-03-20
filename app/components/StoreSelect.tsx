@@ -13,7 +13,13 @@ type Store = {
   description?: string;
 };
 
-function StoreSelect({ register }: { register: UseFormRegister<Product> }) {
+function StoreSelect({
+  register,
+  defaultStore,
+}: {
+  register: UseFormRegister<Product>;
+  defaultStore: string;
+}) {
   const [stores, setStores] = useState<Store[]>([]);
   useEffect(() => {
     const fetchData = async () => {
@@ -39,9 +45,12 @@ function StoreSelect({ register }: { register: UseFormRegister<Product> }) {
 
   return (
     <select
-      {...register("storeName", { required: true })}
+      {...register("storeName", { required: true, value: defaultStore })}
       className=" w-full p-4 border-2 border-gray-300 text-black rounded-lg mb-4"
     >
+      <option value="" disabled>
+        Select A Store
+      </option>
       {stores.map((store, index) => {
         return <option key={index}>{store.name}</option>;
       })}

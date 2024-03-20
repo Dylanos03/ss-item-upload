@@ -58,20 +58,22 @@ function AllProducts() {
           </select>
         </div>
       </div>
-      <table className=" text-left p-4">
-        <thead>
+      <table className=" border-collapse text-left p-4">
+        <thead className="sticky top-0 bg-black">
           <tr>
-            <th>Name</th>
-            <th>Description</th>
-            <th>Price</th>
-            <th>Specs</th>
-            <th>Images</th>
-            <th>Store</th>
+            <th className="border border-gray-300">Name</th>
+            <th className="border border-gray-300">Description</th>
+            <th className="border border-gray-300">Price</th>
+            <th className="border border-gray-300">Specs</th>
+            <th className="border border-gray-300">Images</th>
+            <th className="border border-gray-300">Store</th>
+            <th className="border border-gray-300">Options</th>
           </tr>
         </thead>
         <tbody>
           {products
             .filter((product) => product.storeName.includes(selectedStore))
+            .sort((a, b) => a.name.localeCompare(b.name))
             .map((product, index) => {
               return (
                 <ProductItem
