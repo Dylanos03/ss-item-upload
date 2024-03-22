@@ -35,7 +35,8 @@ type File = {
 export default function Home() {
   const [submitting, setSubmitting] = useState(false);
   const [popUp, setPopUp] = useState(false);
-  const { register, handleSubmit, control, reset } = useForm<Product>();
+  const { register, handleSubmit, control, reset, watch } = useForm<Product>();
+  const filecount = watch("files");
   const submitHandler = async (data: Product) => {
     setSubmitting(true);
     try {
@@ -121,7 +122,7 @@ export default function Home() {
     }
   };
   return (
-    <main className="flex min-h-screen flex-col items-center text-black justify-between p-24">
+    <main className="flex min-h-screen flex-col items-center text-black justify-between p-2">
       {popUp && <AddedPopUp />}
       <form
         onSubmit={handleSubmit(submitHandler)}
@@ -131,46 +132,51 @@ export default function Home() {
         <StoreSelect register={register} defaultStore="" />
         <input
           required
-          className=" w-full p-4 border-2 border-gray-300 text-black rounded-lg mb-4"
+          className=" w-full p-2 border-2 border-gray-300 text-black rounded-lg mb-4"
           type="text"
           placeholder="Product name"
           {...register("name", { required: true })}
         />
         <input
           required
-          className=" w-full p-4 border-2 border-gray-300 text-black rounded-lg mb-4"
+          className=" w-full p-2 border-2 border-gray-300 text-black rounded-lg mb-4"
           type="number"
           placeholder="Price"
           {...register("price", { required: true })}
         />
         <textarea
           required
-          className=" w-full p-4 border-2 border-gray-300 text-black rounded-lg mb-4"
+          className=" w-full p-2 border-2 border-gray-300 text-black rounded-lg mb-4"
           placeholder="Description"
-          rows={6}
+          rows={4}
           {...register("desc", { required: true })}
         />
         <textarea
           required
-          className=" w-full p-4 border-2 border-gray-300 text-black rounded-lg mb-4"
-          rows={6}
+          className=" w-full p-2 border-2 border-gray-300 text-black rounded-lg mb-4"
+          rows={4}
           placeholder="Specs"
           {...register("specs", { required: true })}
         />
-        <Controller
-          name="files"
-          control={control}
-          defaultValue={[]}
-          render={({ field }) => (
-            <input
-              required
-              type="file"
-              multiple
-              className=" w-full p-4 border-2 border-gray-300 rounded-lg mb-4"
-              onChange={(e) => field.onChange(e.target.files)}
-            />
-          )}
-        />
+        <div className=" w-full p-2 border-2 border-gray-300 rounded-lg mb-4 flex gap-2 items-center">
+          <Controller
+            name="files"
+            control={control}
+            defaultValue={[]}
+            render={({ field }) => (
+              <input
+                required
+                type="file"
+                multiple
+                onChange={(e) => field.onChange(e.target.files)}
+              />
+            )}
+          />
+          <span className="text-white">
+            {filecount && filecount.length + " files uploaded"}
+          </span>
+        </div>
+
         <button
           className=" bg-white w-full p-3 font-bold text-xl"
           type="submit"
