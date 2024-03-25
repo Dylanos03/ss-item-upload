@@ -114,7 +114,7 @@ export default function Page() {
         onSubmit={handleSubmit(submitHandler)}
         className="flex flex-col items-center justify-center w-full"
       >
-        <h1 className="text-4xl font-bold mb-8 text-white">Add a product</h1>
+        <h1 className="text-4xl font-bold mb-8 text-white">Add a store</h1>
 
         <input
           required
