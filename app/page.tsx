@@ -142,6 +142,7 @@ export default function Home() {
           className=" w-full p-2 border-2 border-gray-300 text-black rounded-lg mb-4"
           type="number"
           placeholder="Price"
+          step={0.01}
           {...register("price", { required: true })}
         />
         <textarea
